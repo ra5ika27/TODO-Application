@@ -167,17 +167,27 @@ describe('PATCH /todos/:id', () => {
   });
 
   it('should clear completedAt when todo is not completed', (done) => {
-    var hexId = new ObjectID().toHexString();
+    var hexId = todos[1]._id.toHexString();
+    var text = 'This should be the new text';
 
     request(app)
-      .delete(`/todos/${hexId}`)
-      .expect(404)
+      .patch(`/todos/${hexId}`)
+      .send({
+        completed: false,
+        text
+      })
+      .expect(200)
+      .expect((res) => {
+        expect(res.body.todo.text).toBe(text);
+        expect(res.body.todo.completed).toBe(false);
+        expect(res.body.todo.completedAt).toBeNull();
+      })
       .end(done);
   });
 
   it('should return 404 if object is invalid', (done) => {
     request(app)
-      .delete(`/todos/123abc`)
+      .patch(`/todos/123abc`)
       .expect(404)
       .end(done);
   })
