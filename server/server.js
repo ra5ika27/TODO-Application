@@ -95,6 +95,22 @@ app.patch('/todos/:id', (req, res) => {
   }).catch((e) => res.status(400).send())
 })
 
+//new users and passwords (SIGN UP)
+app.post('/users', (req, res) => {
+  var body = _.pick(req.body, ['email', 'password']);
+  var user = new User(body);
+
+  //saving and sending back response to postman
+  user.save().then(() => {
+    return user.generateAuthToken();
+    //res.send(user);
+  }).then((token) => {
+    res.header('x-auth', token).send(user);
+  }).catch((e) => {
+    res.status(400).send(e);
+  })
+});
+
 app.listen(port, () => {
   console.log(`Starting port ${port}`);
 });
